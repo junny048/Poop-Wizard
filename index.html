@@ -12,15 +12,13 @@
     <p id="startSubtitle">Top-down survival stage battle</p>
     <div id="startGrid">
       <section class="startCard">
-        <h2 id="authTitle">Login / Sign Up</h2>
+        <h2 id="authTitle">Login</h2>
         <label for="authId">ID</label>
         <input id="authId" type="text" placeholder="id" maxlength="24" />
         <label for="authPassword">Password</label>
         <input id="authPassword" type="password" placeholder="password" maxlength="64" />
-        <label for="authUsername">Username (Sign up only)</label>
-        <input id="authUsername" type="text" placeholder="username" maxlength="20" />
         <div class="btnRow">
-          <button id="signupBtn" type="button">Sign Up</button>
+          <button id="openSignupBtn" type="button">Sign Up</button>
           <button id="loginBtn" type="button">Login</button>
           <button id="logoutBtn" type="button">Logout</button>
         </div>
@@ -38,6 +36,22 @@
     </div>
     <div class="btnRow">
       <button id="startGameBtn" type="button">Start Game</button>
+    </div>
+  </div>
+
+  <div id="signupModal" class="hidden">
+    <div id="signupCard">
+      <h2>Sign Up</h2>
+      <label for="signupId">ID</label>
+      <input id="signupId" type="text" placeholder="id" maxlength="24" />
+      <label for="signupPassword">Password</label>
+      <input id="signupPassword" type="password" placeholder="password" maxlength="64" />
+      <label for="signupUsername">Username</label>
+      <input id="signupUsername" type="text" placeholder="username" maxlength="20" />
+      <div class="btnRow">
+        <button id="signupSubmitBtn" type="button">Create Account</button>
+        <button id="signupCancelBtn" type="button">Cancel</button>
+      </div>
     </div>
   </div>
 

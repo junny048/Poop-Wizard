@@ -2,13 +2,18 @@ const el = (id) => document.getElementById(id);
 const startScreen = el("startScreen");
 const authId = el("authId");
 const authPassword = el("authPassword");
-const authUsername = el("authUsername");
+const openSignupBtn = el("openSignupBtn");
 const authStatus = el("authStatus");
+const signupModal = el("signupModal");
+const signupId = el("signupId");
+const signupPassword = el("signupPassword");
+const signupUsername = el("signupUsername");
+const signupSubmitBtn = el("signupSubmitBtn");
+const signupCancelBtn = el("signupCancelBtn");
 const startLeaderboard = el("startLeaderboard");
 const startSubtitle = el("startSubtitle");
 const authTitle = el("authTitle");
 const startRankTitle = el("startRankTitle");
-const signupBtn = el("signupBtn");
 const loginBtn = el("loginBtn");
 const logoutBtn = el("logoutBtn");
 const authUserStatus = el("authUserStatus");
@@ -30,7 +35,7 @@ const canvas = el("game");
 const ctx = canvas.getContext("2d");
 
 const I18N = {
-  en: { startSubtitle: "Top-down survival stage battle", authTitle: "Login / Sign Up", rank: "Online Leaderboard", start: "Start Game", signup: "Sign Up", login: "Login", needCfg: "Fill firebase-config.js", okOnline: "Online ready", fail: "Auth failed", loginOk: "Login success", signupOk: "Sign up success", user: "User", leaderboard: "Leaderboard", stage: "Stage", wave: "Wave", level: "Level", score: "Score", best: "Best", hp: "HP", paused: "Paused", resume: "Press ESC to resume", gameOver: "Game Over", restart: "Press F5 to restart" },
+  en: { startSubtitle: "Top-down survival stage battle", authTitle: "Login", rank: "Online Leaderboard", start: "Start Game", signup: "Sign Up", login: "Login", needCfg: "Fill firebase-config.js", okOnline: "Online ready", fail: "Auth failed", loginOk: "Login success", signupOk: "Sign up success", user: "User", leaderboard: "Leaderboard", stage: "Stage", wave: "Wave", level: "Level", score: "Score", best: "Best", hp: "HP", paused: "Paused", resume: "Press ESC to resume", gameOver: "Game Over", restart: "Press F5 to restart" },
   ko: { startSubtitle: "탑다운 생존 스테이지 배틀", authTitle: "로그인 / 회원가입", rank: "온라인 랭킹", start: "게임 시작", signup: "회원가입", login: "로그인", needCfg: "firebase-config.js 설정 필요", okOnline: "온라인 사용 가능", fail: "인증 실패", loginOk: "로그인 완료", signupOk: "회원가입 완료", user: "유저", leaderboard: "랭킹", stage: "스테이지", wave: "웨이브", level: "레벨", score: "점수", best: "최고", hp: "체력", paused: "일시정지", resume: "ESC를 눌러 계속", gameOver: "게임 오버", restart: "F5로 다시 시작" },
 };
 
@@ -81,7 +86,7 @@ function updateStartText() {
   startSubtitle.textContent = t("startSubtitle");
   authTitle.textContent = t("authTitle");
   startRankTitle.textContent = t("rank");
-  signupBtn.textContent = t("signup");
+  openSignupBtn.textContent = t("signup");
   loginBtn.textContent = t("login");
   startGameBtn.textContent = t("start");
 }
@@ -147,12 +152,18 @@ async function initFirebase() {
 
 async function signup() {
   if (!firebaseReady) return;
-  const id = authId.value.trim(), pw = authPassword.value.trim(), username = authUsername.value.trim();
+  const id = signupId.value.trim(), pw = signupPassword.value.trim(), username = signupUsername.value.trim();
   if (!id || !pw || !username) return setAuthStatus(t("fail"), true);
   try {
     const cred = await auth.createUserWithEmailAndPassword(toEmail(id), pw);
     await db.collection("users").doc(cred.user.uid).set({ id, username, createdAt: Date.now() });
     me = { uid: cred.user.uid, username };
+    signupModal.classList.add("hidden");
+    authId.value = id;
+    authPassword.value = "";
+    signupId.value = "";
+    signupPassword.value = "";
+    signupUsername.value = "";
     setAuthStatus(t("signupOk"));
   } catch { setAuthStatus(t("fail"), true); }
 }
@@ -356,7 +367,12 @@ function updateHud() {
 }
 
 langToggle.addEventListener("click", () => { state.lang = state.lang === "en" ? "ko" : "en"; updateStartText(); renderBoards(); updateHud(); });
-signupBtn.addEventListener("click", signup);
+openSignupBtn.addEventListener("click", () => {
+  signupModal.classList.remove("hidden");
+  signupId.focus();
+});
+signupSubmitBtn.addEventListener("click", signup);
+signupCancelBtn.addEventListener("click", () => signupModal.classList.add("hidden"));
 loginBtn.addEventListener("click", login);
 if (logoutBtn) logoutBtn.addEventListener("click", logout);
 if (startTabOnline) startTabOnline.addEventListener("click", () => { state.boardMode = "online"; renderBoards(); });
@@ -364,7 +380,14 @@ if (panelTabOnline) panelTabOnline.addEventListener("click", () => { state.board
 if (startTabLocal) startTabLocal.addEventListener("click", () => { state.boardMode = "local"; renderBoards(); });
 if (panelTabLocal) panelTabLocal.addEventListener("click", () => { state.boardMode = "local"; renderBoards(); });
 startGameBtn.addEventListener("click", startGame);
-addEventListener("keydown", (e) => { if (e.key === "Escape" && state.started && !state.gameOver && !state.levelup) state.paused = !state.paused; });
+addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!signupModal.classList.contains("hidden")) {
+    signupModal.classList.add("hidden");
+    return;
+  }
+  if (state.started && !state.gameOver && !state.levelup) state.paused = !state.paused;
+});
 
 let last = performance.now();
 function loop(now) {

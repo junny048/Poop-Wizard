@@ -123,6 +123,44 @@ body {
   padding: 10px 18px;
 }
 
+#signupModal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 18px;
+}
+
+#signupCard {
+  width: min(420px, calc(100vw - 24px));
+  background: linear-gradient(150deg, rgba(12, 15, 20, 0.96), rgba(30, 34, 41, 0.9));
+  border: 1px solid rgba(188, 214, 235, 0.45);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+#signupCard h2 {
+  margin: 0 0 10px 0;
+}
+
+#signupCard label {
+  display: block;
+  font-size: 13px;
+  margin: 8px 0 4px 0;
+}
+
+#signupCard input {
+  width: 100%;
+  border: 1px solid rgba(190, 212, 230, 0.45);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #f4f8ff;
+  background: rgba(17, 23, 31, 0.85);
+}
+
 #ui {
   position: fixed;
   left: 16px;

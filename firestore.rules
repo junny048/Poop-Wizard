@@ -6,6 +6,22 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 
+    match /usernames/{uname} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.username is string
+        && request.resource.data.username.size() >= 2
+        && request.resource.data.username.size() <= 20
+        && request.resource.data.usernameKey is string
+        && request.resource.data.usernameKey == uname
+        && request.resource.data.usernameKey.size() >= 2
+        && request.resource.data.usernameKey.size() <= 20
+        && request.resource.data.createdAt is int
+        && request.resource.data.createdAt > 0;
+      allow update, delete: if false;
+    }
+
     match /scores/{uid} {
       allow read: if true;
       allow create: if request.auth != null

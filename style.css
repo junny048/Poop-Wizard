@@ -203,6 +203,10 @@ button.pulseActive {
   padding: 18px;
 }
 
+#signupModal.hidden {
+  display: none;
+}
+
 #signupCard {
   width: min(420px, calc(100vw - 24px));
   background: linear-gradient(150deg, rgba(12, 15, 20, 0.96), rgba(30, 34, 41, 0.9));
@@ -286,6 +290,48 @@ button.pulseActive {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, #c13f3f, #f26f54);
+}
+
+#skillBar {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 19;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(860px, calc(100vw - 24px));
+}
+
+.skillSlot {
+  min-width: 150px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(195, 218, 245, 0.5);
+  background: linear-gradient(150deg, rgba(12, 15, 20, 0.9), rgba(30, 34, 41, 0.84));
+  color: #dff2ff;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.skillSlot .k {
+  display: inline-block;
+  font-weight: 800;
+  border: 1px solid rgba(170, 222, 255, 0.62);
+  border-radius: 6px;
+  padding: 1px 6px;
+  margin-right: 6px;
+}
+
+.skillSlot .cd {
+  color: #ffd29f;
+  font-weight: 700;
+}
+
+.skillSlot.locked {
+  opacity: 0.6;
 }
 
 #levelup {
@@ -420,7 +466,7 @@ button.pulseActive {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 880px) {

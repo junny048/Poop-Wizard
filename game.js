@@ -183,14 +183,21 @@ async function submitOnline() {
   if (!firebaseReady || !me || !db) return;
   try {
     const now = Date.now();
-    await db.collection("scores").add({
+    const scoreRef = db.collection("scores").doc(me.uid);
+    const prevDoc = await scoreRef.get();
+    const prevScore = prevDoc.exists ? Number(prevDoc.data().score || 0) : 0;
+    if (state.score < prevScore) {
+      await loadOnlineScores();
+      return;
+    }
+    await scoreRef.set({
       uid: me.uid,
       userId: me.username || dispUser(),
       score: Math.max(0, Math.floor(state.score)),
       stage: Math.max(1, Math.floor(state.stage)),
       level: Math.max(1, Math.floor(player.level)),
-      createdAt: now,
-    });
+      updatedAt: now,
+    }, { merge: true });
     await loadOnlineScores();
   } catch {}
 }

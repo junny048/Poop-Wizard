@@ -6,9 +6,10 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 
-    match /scores/{docId} {
+    match /scores/{uid} {
       allow read: if true;
       allow create: if request.auth != null
+        && uid == request.auth.uid
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.userId is string
         && request.resource.data.userId.size() >= 1
@@ -22,9 +23,26 @@ service cloud.firestore {
         && request.resource.data.level is int
         && request.resource.data.level >= 1
         && request.resource.data.level <= 999
-        && request.resource.data.createdAt is int
-        && request.resource.data.createdAt > 0;
-      allow update, delete: if false;
+        && request.resource.data.updatedAt is int
+        && request.resource.data.updatedAt > 0;
+      allow update: if request.auth != null
+        && uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() >= 1
+        && request.resource.data.userId.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score >= resource.data.score
+        && request.resource.data.score <= 1000000000
+        && request.resource.data.stage is int
+        && request.resource.data.stage >= resource.data.stage
+        && request.resource.data.stage <= 999
+        && request.resource.data.level is int
+        && request.resource.data.level >= resource.data.level
+        && request.resource.data.level <= 999
+        && request.resource.data.updatedAt is int
+        && request.resource.data.updatedAt >= resource.data.updatedAt;
+      allow delete: if false;
     }
   }
 }

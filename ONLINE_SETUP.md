@@ -51,6 +51,7 @@ firebase deploy --only hosting
 ```
 
 ## Security note
-- `scores` can be written only by logged-in users.
-- Rules validate `uid`, `userId`, `score`, `stage`, `level`, `createdAt`.
-- `update/delete` on scores is blocked.
+- `scores/{uid}` is writable only by that logged-in uid.
+- Rules validate `uid`, `userId`, `score`, `stage`, `level`, `updatedAt`.
+- Only score/stage/level non-decreasing updates are allowed.
+- `delete` on scores is blocked.

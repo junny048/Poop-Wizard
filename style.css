@@ -1,0 +1,326 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 10%, #3f2f16 0%, #1c140a 45%, #090603 100%);
+  color: #f6f0df;
+  font-family: "Trebuchet MS", "Verdana", sans-serif;
+}
+
+#game {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: crosshair;
+}
+
+#startScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(137, 90, 45, 0.2), transparent 36%),
+    radial-gradient(circle at 88% 82%, rgba(54, 126, 88, 0.2), transparent 36%),
+    linear-gradient(160deg, rgba(10, 7, 4, 0.96), rgba(26, 14, 8, 0.93));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#startScreen h1 {
+  margin: 0;
+  font-size: clamp(44px, 7vw, 92px);
+  letter-spacing: 2px;
+  color: #ffe5af;
+  text-shadow: 0 6px 28px rgba(0, 0, 0, 0.55);
+}
+
+#startSubtitle {
+  margin: 8px 0 18px 0;
+  opacity: 0.9;
+}
+
+#startGrid {
+  width: min(980px, calc(100vw - 24px));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.startCard {
+  background: linear-gradient(150deg, rgba(12, 15, 20, 0.92), rgba(30, 34, 41, 0.86));
+  border: 1px solid rgba(188, 214, 235, 0.45);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.startCard h2 {
+  margin: 0 0 10px 0;
+}
+
+.startCard label {
+  display: block;
+  font-size: 13px;
+  margin: 8px 0 4px 0;
+}
+
+.startCard input {
+  width: 100%;
+  border: 1px solid rgba(190, 212, 230, 0.45);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #f4f8ff;
+  background: rgba(17, 23, 31, 0.85);
+}
+
+.btnRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btnRow button {
+  border: 1px solid rgba(186, 222, 250, 0.62);
+  border-radius: 8px;
+  background: rgba(26, 45, 63, 0.92);
+  color: #dff2ff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+#authStatus {
+  margin-top: 8px;
+  min-height: 20px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+#authUserStatus {
+  margin-top: 8px;
+  min-height: 18px;
+  font-size: 13px;
+  color: #d1eaff;
+}
+
+#startLeaderboard {
+  max-height: 248px;
+  overflow: auto;
+}
+
+#startGameBtn {
+  margin-top: 14px;
+  font-size: 18px;
+  padding: 10px 18px;
+}
+
+#ui {
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 10;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 #000;
+  background: linear-gradient(140deg, rgba(25, 19, 12, 0.75), rgba(63, 36, 18, 0.45));
+  border: 1px solid rgba(220, 187, 120, 0.45);
+  border-radius: 12px;
+  padding: 10px 12px;
+  backdrop-filter: blur(2px);
+}
+
+#hud {
+  line-height: 1.6;
+}
+
+#hpPanel {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 18;
+  width: min(520px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 206, 186, 0.6);
+  background: linear-gradient(155deg, rgba(36, 20, 16, 0.9), rgba(58, 22, 18, 0.8));
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+}
+
+#hpText {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 6px;
+  color: #ffe7d8;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+#hpBar {
+  width: 100%;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+#hpFill {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c13f3f, #f26f54);
+}
+
+#levelup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(860px, calc(100vw - 40px));
+  background: rgba(28, 20, 10, 0.97);
+  border: 2px solid #c6a76a;
+  border-radius: 12px;
+  padding: 18px;
+  z-index: 20;
+}
+
+#levelup h2 {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+#choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.choice {
+  border: 1px solid #d7bc80;
+  background: #2d2011;
+  color: #f6f0df;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 130px;
+}
+
+.choice:hover {
+  background: #443016;
+}
+
+.choice h3 {
+  margin: 0 0 8px 0;
+}
+
+.choice p {
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+#langPanel {
+  position: fixed;
+  right: 16px;
+  top: 12px;
+  z-index: 19;
+  background: linear-gradient(150deg, rgba(12, 15, 20, 0.9), rgba(30, 34, 41, 0.84));
+  border: 1px solid rgba(143, 193, 233, 0.5);
+  border-radius: 12px;
+  padding: 8px;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+#langToggle {
+  border: 1px solid rgba(170, 222, 255, 0.7);
+  border-radius: 8px;
+  background: rgba(20, 34, 48, 0.85);
+  color: #d5efff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+#langToggle:hover {
+  background: rgba(38, 58, 78, 0.95);
+}
+
+#leaderboardPanel {
+  position: fixed;
+  right: 16px;
+  top: 68px;
+  z-index: 19;
+  width: min(320px, calc(100vw - 24px));
+  background: linear-gradient(150deg, rgba(12, 15, 20, 0.9), rgba(30, 34, 41, 0.84));
+  border: 1px solid rgba(143, 193, 233, 0.5);
+  border-radius: 12px;
+  padding: 10px;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+#leaderboardTitle {
+  margin: 0 0 6px 0;
+  color: #d7f2ff;
+  font-size: 16px;
+}
+
+#userIdText {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.leaderboard-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+
+.tabRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tabBtn {
+  border: 1px solid rgba(170, 222, 255, 0.5);
+  border-radius: 8px;
+  background: rgba(20, 34, 48, 0.68);
+  color: #d5efff;
+  cursor: pointer;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.tabBtn.active {
+  background: rgba(53, 93, 124, 0.95);
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 880px) {
+  #choices {
+    grid-template-columns: 1fr;
+  }
+  #startGrid {
+    grid-template-columns: 1fr;
+  }
+}

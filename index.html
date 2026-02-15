@@ -1,0 +1,79 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poop Wizard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="startScreen">
+    <h1>Poop Wizard</h1>
+    <p id="startSubtitle">Top-down survival stage battle</p>
+    <div id="startGrid">
+      <section class="startCard">
+        <h2 id="authTitle">Login / Sign Up</h2>
+        <label for="authId">ID</label>
+        <input id="authId" type="text" placeholder="id" maxlength="24" />
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" placeholder="password" maxlength="64" />
+        <label for="authUsername">Username (Sign up only)</label>
+        <input id="authUsername" type="text" placeholder="username" maxlength="20" />
+        <div class="btnRow">
+          <button id="signupBtn" type="button">Sign Up</button>
+          <button id="loginBtn" type="button">Login</button>
+          <button id="logoutBtn" type="button">Logout</button>
+        </div>
+        <div id="authUserStatus"></div>
+        <div id="authStatus"></div>
+      </section>
+      <section class="startCard">
+        <h2 id="startRankTitle">Online Leaderboard</h2>
+        <div class="tabRow">
+          <button id="startTabOnline" type="button" class="tabBtn active">Online</button>
+          <button id="startTabLocal" type="button" class="tabBtn">Local</button>
+        </div>
+        <div id="startLeaderboard"></div>
+      </section>
+    </div>
+    <div class="btnRow">
+      <button id="startGameBtn" type="button">Start Game</button>
+    </div>
+  </div>
+
+  <div id="ui">
+    <div id="hud"></div>
+  </div>
+  <div id="hpPanel">
+    <div id="hpText">HP 100 / 100</div>
+    <div id="hpBar">
+      <div id="hpFill"></div>
+    </div>
+  </div>
+  <div id="langPanel">
+    <button id="langToggle" type="button">KO</button>
+  </div>
+  <div id="leaderboardPanel">
+    <h3 id="leaderboardTitle">Leaderboard</h3>
+    <div id="userIdText"></div>
+    <div class="tabRow">
+      <button id="panelTabOnline" type="button" class="tabBtn active">Online</button>
+      <button id="panelTabLocal" type="button" class="tabBtn">Local</button>
+    </div>
+    <div id="leaderboardContent"></div>
+  </div>
+  <canvas id="game" width="1280" height="720"></canvas>
+
+  <div id="levelup" class="hidden">
+    <h2>Level Up! Choose one upgrade</h2>
+    <div id="choices"></div>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-functions-compat.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

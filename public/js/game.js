@@ -45,7 +45,7 @@ const I18N = {
 };
 
 const state = { lang: "en", started: false, paused: false, levelup: false, gameOver: false, stage: 1, wave: 1, score: 0, scoreSaved: false };
-const player = { x: 0, y: 0, r: 14, hp: 100, maxHp: 100, speed: 280, level: 1, exp: 0, expNeed: 24, damage: 10, atkCd: 0, atkInt: 0.45 };
+const player = { x: 0, y: 0, r: 14, hp: 100, maxHp: 100, speed: 280, level: 1, exp: 0, expNeed: 24, damage: 10, atkCd: 0, atkInt: 0.45, volley: 1, backShot: false };
 const input = { w: false, a: false, s: false, d: false };
 const mouse = { x: 0, y: 0 };
 const enemies = [];
@@ -482,6 +482,7 @@ function saveScoreIfNeeded() {
 function resetRun() {
   player.x = canvas.width / 2; player.y = canvas.height / 2; player.hp = player.maxHp; player.level = 1; player.exp = 0; player.expNeed = 24;
   player.damage = 10; player.atkInt = 0.45; player.atkCd = 0;
+  player.volley = 1; player.backShot = false;
   state.stage = 1; state.wave = 1; state.score = 0; state.gameOver = false; state.scoreSaved = false;
   enemies.length = 0; bullets.length = 0; enemyBullets.length = 0; dangerZones.length = 0; portal.on = false;
   unlockedSkills.length = 0;
@@ -550,16 +551,37 @@ function startGame() {
 
 function shoot() {
   const a = Math.atan2(mouse.y - player.y, mouse.x - player.x);
-  bullets.push({
-    x: player.x,
-    y: player.y,
-    vx: Math.cos(a) * 520,
-    vy: Math.sin(a) * 520,
-    life: 1.3,
-    r: 6,
-    dmg: player.damage,
-    rot: Math.random() * Math.PI * 2,
-  });
+  const count = Math.max(1, Math.floor(player.volley || 1));
+  const step = 0.14;
+  const start = -((count - 1) * step) / 2;
+  for (let i = 0; i < count; i += 1) {
+    const aa = a + start + i * step;
+    bullets.push({
+      x: player.x,
+      y: player.y,
+      vx: Math.cos(aa) * 520,
+      vy: Math.sin(aa) * 520,
+      life: 1.3,
+      r: 6,
+      dmg: player.damage,
+      rot: Math.random() * Math.PI * 2,
+    });
+  }
+  if (player.backShot) {
+    for (let i = 0; i < count; i += 1) {
+      const aa = a + Math.PI + start + i * step;
+      bullets.push({
+        x: player.x,
+        y: player.y,
+        vx: Math.cos(aa) * 490,
+        vy: Math.sin(aa) * 490,
+        life: 1.2,
+        r: 5.5,
+        dmg: player.damage * 0.92,
+        rot: Math.random() * Math.PI * 2,
+      });
+    }
+  }
 }
 
 function levelUpCheck(exp) {
@@ -576,6 +598,9 @@ function levelUpCheck(exp) {
     { name: "Shot Size +", desc: "Wider hit radius", apply: () => { bullets.forEach((b) => { b.r += 0.2; }); player.damage += 2; } },
     { name: "Cooldown Cut", desc: "Active skill cooldown -12%", apply: () => { Object.keys(skillState).forEach((k) => { skillState[k] *= 0.88; }); } },
     { name: "Shielded Heart", desc: "Small instant barrier heal", apply: () => { player.hp = Math.min(player.maxHp, player.hp + 24); player.maxHp += 6; } },
+    { name: "Double Poop", desc: "Shoot one more poop forward", apply: () => { player.volley = Math.min(5, player.volley + 1); } },
+    { name: "Front + Back Shot", desc: "Shoot backward together", apply: () => { player.backShot = true; } },
+    { name: "Heavy Poop +10", desc: "Strong projectile damage boost", apply: () => { player.damage += 10; } },
   ];
   const picks = [];
   while (picks.length < 3 && pool.length > 0) {

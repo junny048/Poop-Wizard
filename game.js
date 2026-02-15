@@ -52,6 +52,7 @@ let auth = null;
 let db = null;
 let me = null;
 let onlineScores = [];
+let authBusy = false;
 
 function setMoveKey(key, pressed) {
   if (!key) return;
@@ -75,6 +76,27 @@ addEventListener("resize", resize); resize();
 function t(k) { return I18N[state.lang][k] || k; }
 function setAuthStatus(msg, err = false) { authStatus.textContent = msg; authStatus.style.color = err ? "#ff9f9f" : "#bff5c9"; }
 function toEmail(id) { return `${id}@poopwizard.local`; }
+function normalizeId(id) { return id.trim().toLowerCase(); }
+function isValidId(id) { return /^[a-z0-9._-]{4,24}$/.test(id); }
+function isValidPassword(pw) { return pw.length >= 6; }
+function isValidUsername(name) { return name.length >= 2 && name.length <= 20; }
+function authErrorText(err) {
+  const code = err?.code || "";
+  if (code === "auth/email-already-in-use") return "ID already exists";
+  if (code === "auth/invalid-email") return "ID format is invalid (a-z, 0-9, . _ -)";
+  if (code === "auth/weak-password") return "Password must be at least 6 characters";
+  if (code === "auth/user-not-found") return "Account not found";
+  if (code === "auth/wrong-password" || code === "auth/invalid-credential") return "Wrong ID or password";
+  if (code === "auth/network-request-failed") return "Network error. Check internet and retry";
+  const msg = err?.message ? `: ${err.message}` : "";
+  return `Auth failed (${code || "unknown"})${msg}`;
+}
+function setAuthBusy(v) {
+  authBusy = v;
+  if (openSignupBtn) openSignupBtn.disabled = v;
+  if (signupSubmitBtn) signupSubmitBtn.disabled = v;
+  if (loginBtn) loginBtn.disabled = v;
+}
 function dispUser() { return me?.username || anonId; }
 function bestScore() { const pool = onlineScores.length ? onlineScores : localScores; return pool[0]?.score || 0; }
 function dist(a, b, c, d) { return Math.hypot(c - a, d - b); }
@@ -136,7 +158,7 @@ async function initFirebase() {
     setAuthStatus(t("okOnline"));
     auth.onAuthStateChanged(async (u) => {
       if (!u) { me = null; renderBoards(); return; }
-      let username = u.email.split("@")[0];
+      let username = u.displayName || u.email.split("@")[0];
       try {
         const doc = await db.collection("users").doc(u.uid).get();
         if (doc.exists && doc.data().username) username = doc.data().username;
@@ -151,12 +173,25 @@ async function initFirebase() {
 }
 
 async function signup() {
-  if (!firebaseReady) return;
-  const id = signupId.value.trim(), pw = signupPassword.value.trim(), username = signupUsername.value.trim();
-  if (!id || !pw || !username) return setAuthStatus(t("fail"), true);
+  if (!firebaseReady || authBusy) return;
+  const id = normalizeId(signupId.value);
+  const pw = signupPassword.value.trim();
+  const username = signupUsername.value.trim();
+  if (!isValidId(id)) return setAuthStatus("ID must be 4-24 chars (a-z, 0-9, . _ -)", true);
+  if (!isValidPassword(pw)) return setAuthStatus("Password must be at least 6 characters", true);
+  if (!isValidUsername(username)) return setAuthStatus("Username must be 2-20 characters", true);
   try {
+    setAuthBusy(true);
+    setAuthStatus("Creating account...");
     const cred = await auth.createUserWithEmailAndPassword(toEmail(id), pw);
-    await db.collection("users").doc(cred.user.uid).set({ id, username, createdAt: Date.now() });
+    try {
+      await cred.user.updateProfile({ displayName: username });
+    } catch {}
+    try {
+      await db.collection("users").doc(cred.user.uid).set({ id, username, createdAt: Date.now() }, { merge: true });
+    } catch (profileErr) {
+      console.warn("profile write failed", profileErr);
+    }
     me = { uid: cred.user.uid, username };
     signupModal.classList.add("hidden");
     authId.value = id;
@@ -165,18 +200,32 @@ async function signup() {
     signupPassword.value = "";
     signupUsername.value = "";
     setAuthStatus(t("signupOk"));
-  } catch { setAuthStatus(t("fail"), true); }
+  } catch (err) {
+    console.error("signup failed", err);
+    setAuthStatus(authErrorText(err), true);
+  } finally {
+    setAuthBusy(false);
+  }
 }
 async function login() {
-  if (!firebaseReady) return;
-  const id = authId.value.trim(), pw = authPassword.value.trim();
-  if (!id || !pw) return setAuthStatus(t("fail"), true);
+  if (!firebaseReady || authBusy) return;
+  const id = normalizeId(authId.value);
+  const pw = authPassword.value.trim();
+  if (!isValidId(id)) return setAuthStatus("Check ID format (a-z, 0-9, . _ -)", true);
+  if (!isValidPassword(pw)) return setAuthStatus("Password must be at least 6 characters", true);
   try {
+    setAuthBusy(true);
+    setAuthStatus("Logging in...");
     const cred = await auth.signInWithEmailAndPassword(toEmail(id), pw);
     const doc = await db.collection("users").doc(cred.user.uid).get();
-    me = { uid: cred.user.uid, username: doc.exists ? doc.data().username : id };
+    me = { uid: cred.user.uid, username: doc.exists ? doc.data().username : (cred.user.displayName || id) };
     setAuthStatus(t("loginOk"));
-  } catch { setAuthStatus(t("fail"), true); }
+  } catch (err) {
+    console.error("login failed", err);
+    setAuthStatus(authErrorText(err), true);
+  } finally {
+    setAuthBusy(false);
+  }
 }
 
 async function logout() {
@@ -373,6 +422,9 @@ openSignupBtn.addEventListener("click", () => {
 });
 signupSubmitBtn.addEventListener("click", signup);
 signupCancelBtn.addEventListener("click", () => signupModal.classList.add("hidden"));
+signupUsername.addEventListener("keydown", (e) => { if (e.key === "Enter") signup(); });
+signupPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") signup(); });
+authPassword.addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
 loginBtn.addEventListener("click", login);
 if (logoutBtn) logoutBtn.addEventListener("click", logout);
 if (startTabOnline) startTabOnline.addEventListener("click", () => { state.boardMode = "online"; renderBoards(); });

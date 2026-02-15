@@ -1,7 +1,4 @@
 {
-  "functions": {
-    "source": "functions"
-  },
   "firestore": {
     "rules": "firestore.rules"
   },
@@ -9,8 +6,12 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      ".firebaserc",
+      ".gitignore",
       "**/.*",
+      ".git/**",
       "**/node_modules/**",
+      "functions",
       "functions/**"
     ]
   }

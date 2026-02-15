@@ -8,8 +8,23 @@ service cloud.firestore {
 
     match /scores/{docId} {
       allow read: if true;
-      // Direct client writes are blocked. Use Cloud Functions submitScore.
-      allow create, update, delete: if false;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() >= 1
+        && request.resource.data.userId.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 1000000000
+        && request.resource.data.stage is int
+        && request.resource.data.stage >= 1
+        && request.resource.data.stage <= 999
+        && request.resource.data.level is int
+        && request.resource.data.level >= 1
+        && request.resource.data.level <= 999
+        && request.resource.data.createdAt is int
+        && request.resource.data.createdAt > 0;
+      allow update, delete: if false;
     }
   }
 }

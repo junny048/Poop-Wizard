@@ -32,22 +32,25 @@ npm i -g firebase-tools
 firebase login
 ```
 
-## 4) Deploy Firestore Rules + Function
+## 4) Enable Firebase Products (Spark available)
+
+- Authentication: Email/Password
+- Firestore Database: Create in production mode
+- Hosting: Enable
+
+## 5) Deploy Firestore Rules (Spark)
 
 ```bash
-cd functions
-npm install
-cd ..
-firebase deploy --only firestore:rules,functions:submitScore
+firebase deploy --only firestore:rules
 ```
 
-## 5) (Optional) Deploy Hosting
+## 6) Deploy Hosting
 
 ```bash
 firebase deploy --only hosting
 ```
 
 ## Security note
-- `scores` direct client writes are blocked by `firestore.rules`.
-- Score submission is only through callable Cloud Function `submitScore`.
-- Function enforces auth + payload validation + server timestamp write.
+- `scores` can be written only by logged-in users.
+- Rules validate `uid`, `userId`, `score`, `stage`, `level`, `createdAt`.
+- `update/delete` on scores is blocked.

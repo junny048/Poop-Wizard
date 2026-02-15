@@ -45,7 +45,6 @@ const portal = { on: false, x: 0, y: 0, r: 30 };
 let firebaseReady = false;
 let auth = null;
 let db = null;
-let fns = null;
 let me = null;
 let onlineScores = [];
 
@@ -128,7 +127,6 @@ async function initFirebase() {
     if (!firebase.apps.length) firebase.initializeApp(cfg);
     auth = firebase.auth();
     db = firebase.firestore();
-    fns = firebase.functions("us-central1");
     firebaseReady = true;
     setAuthStatus(t("okOnline"));
     auth.onAuthStateChanged(async (u) => {
@@ -182,10 +180,17 @@ async function logout() {
   }
 }
 async function submitOnline() {
-  if (!firebaseReady || !me || !fns) return;
+  if (!firebaseReady || !me || !db) return;
   try {
-    const submitScore = fns.httpsCallable("submitScore");
-    await submitScore({ score: state.score, stage: state.stage, level: player.level });
+    const now = Date.now();
+    await db.collection("scores").add({
+      uid: me.uid,
+      userId: me.username || dispUser(),
+      score: Math.max(0, Math.floor(state.score)),
+      stage: Math.max(1, Math.floor(state.stage)),
+      level: Math.max(1, Math.floor(player.level)),
+      createdAt: now,
+    });
     await loadOnlineScores();
   } catch {}
 }

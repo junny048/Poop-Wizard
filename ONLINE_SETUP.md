@@ -12,7 +12,7 @@ Edit `.firebaserc`:
 ```
 
 ## 2) Fill Firebase Web Config
-Edit `public/js/firebase-config.js`:
+Edit `firebase-config.js`:
 
 ```js
 window.POOP_WIZARD_FIREBASE_CONFIG = {

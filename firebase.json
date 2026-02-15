@@ -4,7 +4,7 @@
   },
   "hosting": {
     "site": "poop-wizard",
-    "public": "public",
+    "public": ".",
     "headers": [
       {
         "source": "/index.html",
@@ -35,9 +35,6 @@
       }
     ],
     "ignore": [
-      "public/firebase.json",
-      "public/.firebaserc",
-      "public/.gitignore",
       "firebase.json",
       ".firebaserc",
       ".gitignore",

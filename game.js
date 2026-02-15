@@ -384,11 +384,20 @@ async function signup() {
     setAuthStatus("Creating account...");
     const cred = await auth.createUserWithEmailAndPassword(toEmail(id), pw);
     try {
-      await db.collection("usernames").doc(usernameKey).create({
-        uid: cred.user.uid,
-        username,
-        usernameKey,
-        createdAt: Date.now(),
+      const unameRef = db.collection("usernames").doc(usernameKey);
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(unameRef);
+        if (snap.exists) {
+          const err = new Error("Username already exists");
+          err.code = "already-exists";
+          throw err;
+        }
+        tx.set(unameRef, {
+          uid: cred.user.uid,
+          username,
+          usernameKey,
+          createdAt: Date.now(),
+        });
       });
     } catch (nameErr) {
       try { await cred.user.delete(); } catch {}

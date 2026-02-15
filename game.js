@@ -2,7 +2,12 @@ const el = (id) => document.getElementById(id);
 const startScreen = el("startScreen");
 const authId = el("authId");
 const authPassword = el("authPassword");
-const openSignupBtn = el("openSignupBtn");
+const authGate = el("authGate");
+const loginForm = el("loginForm");
+const authGateText = el("authGateText");
+const chooseLoginBtn = el("chooseLoginBtn");
+const chooseSignupBtn = el("chooseSignupBtn");
+const backAuthBtn = el("backAuthBtn");
 const authStatus = el("authStatus");
 const signupModal = el("signupModal");
 const signupId = el("signupId");
@@ -93,9 +98,43 @@ function authErrorText(err) {
 }
 function setAuthBusy(v) {
   authBusy = v;
-  if (openSignupBtn) openSignupBtn.disabled = v;
+  if (chooseLoginBtn) chooseLoginBtn.disabled = v;
+  if (chooseSignupBtn) chooseSignupBtn.disabled = v;
   if (signupSubmitBtn) signupSubmitBtn.disabled = v;
   if (loginBtn) loginBtn.disabled = v;
+  if (backAuthBtn) backAuthBtn.disabled = v;
+}
+function animatePanel(node) {
+  if (!node) return;
+  node.classList.remove("panelFlash");
+  void node.offsetWidth;
+  node.classList.add("panelFlash");
+}
+function showAuthGate() {
+  loginForm.classList.add("hidden");
+  authGate.classList.remove("hidden");
+  animatePanel(authGate);
+}
+function showLoginForm() {
+  authGate.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+  animatePanel(loginForm);
+  authId.focus();
+}
+function openSignupModal() {
+  signupModal.classList.remove("hidden");
+  animatePanel(el("signupCard"));
+  signupId.focus();
+}
+function bindPulseEffects() {
+  document.querySelectorAll("[data-pulse]").forEach((node) => {
+    node.addEventListener("click", () => {
+      node.classList.remove("pulseActive");
+      void node.offsetWidth;
+      node.classList.add("pulseActive");
+      setTimeout(() => node.classList.remove("pulseActive"), 180);
+    });
+  });
 }
 function dispUser() { return me?.username || anonId; }
 function bestScore() { const pool = onlineScores.length ? onlineScores : localScores; return pool[0]?.score || 0; }
@@ -108,7 +147,10 @@ function updateStartText() {
   startSubtitle.textContent = t("startSubtitle");
   authTitle.textContent = t("authTitle");
   startRankTitle.textContent = t("rank");
-  openSignupBtn.textContent = t("signup");
+  authGateText.textContent = state.lang === "en" ? "Choose an option" : "옵션을 선택하세요";
+  chooseLoginBtn.textContent = t("login");
+  chooseSignupBtn.textContent = t("signup");
+  backAuthBtn.textContent = state.lang === "en" ? "Back" : "뒤로";
   loginBtn.textContent = t("login");
   startGameBtn.textContent = t("start");
 }
@@ -199,6 +241,7 @@ async function signup() {
     signupId.value = "";
     signupPassword.value = "";
     signupUsername.value = "";
+    showLoginForm();
     setAuthStatus(t("signupOk"));
   } catch (err) {
     console.error("signup failed", err);
@@ -416,10 +459,9 @@ function updateHud() {
 }
 
 langToggle.addEventListener("click", () => { state.lang = state.lang === "en" ? "ko" : "en"; updateStartText(); renderBoards(); updateHud(); });
-openSignupBtn.addEventListener("click", () => {
-  signupModal.classList.remove("hidden");
-  signupId.focus();
-});
+chooseLoginBtn.addEventListener("click", showLoginForm);
+chooseSignupBtn.addEventListener("click", openSignupModal);
+backAuthBtn.addEventListener("click", showAuthGate);
 signupSubmitBtn.addEventListener("click", signup);
 signupCancelBtn.addEventListener("click", () => signupModal.classList.add("hidden"));
 signupUsername.addEventListener("keydown", (e) => { if (e.key === "Enter") signup(); });
@@ -452,6 +494,8 @@ function loop(now) {
 }
 
 updateStartText();
+showAuthGate();
+bindPulseEffects();
 renderBoards();
 initFirebase();
 requestAnimationFrame(loop);

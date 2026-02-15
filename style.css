@@ -67,6 +67,38 @@ body {
   margin: 0 0 10px 0;
 }
 
+#authGateText {
+  margin: 2px 0 10px;
+  opacity: 0.9;
+}
+
+.modeRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modeBtn {
+  border: 1px solid rgba(186, 222, 250, 0.62);
+  border-radius: 10px;
+  background: rgba(26, 45, 63, 0.92);
+  color: #dff2ff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 12px 10px;
+  transition: transform 0.12s ease, filter 0.16s ease, box-shadow 0.2s ease, opacity 0.16s ease;
+}
+
+.modeBtn:hover {
+  box-shadow: 0 0 18px rgba(141, 209, 255, 0.42);
+  filter: brightness(1.08);
+}
+
+.modeBtn:active {
+  transform: scale(0.98);
+  filter: brightness(0.82);
+}
+
 .startCard label {
   display: block;
   font-size: 13px;
@@ -96,11 +128,43 @@ body {
   font-weight: 700;
   cursor: pointer;
   padding: 8px 12px;
+  transition: transform 0.12s ease, filter 0.16s ease, box-shadow 0.2s ease, opacity 0.16s ease;
+}
+
+.btnRow button:hover {
+  box-shadow: 0 0 14px rgba(141, 209, 255, 0.38);
+  filter: brightness(1.07);
+}
+
+.btnRow button:active {
+  transform: scale(0.98);
+  filter: brightness(0.82);
 }
 
 .btnRow button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+#loginForm.panelFlash,
+#authGate.panelFlash,
+#signupCard.panelFlash {
+  animation: panelIn 0.2s ease-out;
+}
+
+button.pulseActive {
+  box-shadow: 0 0 16px rgba(255, 221, 137, 0.55);
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0.55;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 #authStatus {

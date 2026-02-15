@@ -62,7 +62,7 @@ const BOSS_NAMES = ["King Caca", "Sewer Prophet", "Doom Nugget"];
 const poopShotImg = new Image();
 let poopShotReady = false;
 poopShotImg.onload = () => { poopShotReady = true; };
-poopShotImg.src = "poop-shot.svg";
+poopShotImg.src = "assets/images/poop-shot.svg";
 
 let firebaseReady = false;
 let auth = null;
